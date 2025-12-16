@@ -103,7 +103,7 @@ func runBenchmark() {
 		if err := history.Save(*result); err != nil {
 			log.Fatal("Ошибка сохранения:", err)
 		}
-		fmt.Println("\nРезультат сериализован и сохранен в data/history.json")
+		fmt.Println("Результат сериализован и сохранен в data/history.json")
 	} else {
 		// Показываем JSON результат
 		resultJSON, err := json.MarshalIndent(result, "", "  ")
@@ -111,9 +111,9 @@ func runBenchmark() {
 			log.Fatal("Ошибка сериализации JSON:", err)
 		}
 
-		fmt.Println("\nJSON представление результата:")
+		fmt.Println("JSON представление результата:")
 		fmt.Println(string(resultJSON))
-		fmt.Println("\nДля сохранения добавьте 'save' в конец команды")
+		fmt.Println("Для сохранения добавьте 'save' в конец команды")
 	}
 }
 
