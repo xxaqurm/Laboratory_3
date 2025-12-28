@@ -41,13 +41,14 @@ public:
     const T& front() const;
 
     int find (const T& value) const;
+    bool contains(const T& value) const;
 
     T& back();
     const T& back() const;
 
     T& at(int index) const;
 
-    void display_forward() const;
+    void display() const;
     void display_reverse() const;
 
     int size() const;
@@ -240,7 +241,7 @@ const T& LinkedList<T>::back() const {
 }
 
 template<typename T>
-void LinkedList<T>::display_forward() const {
+void LinkedList<T>::display() const {
     Node* current = head;
     cout << "[";
     while (current) {
@@ -314,4 +315,16 @@ int LinkedList<T>::find(const T& value) const {
     }
 
     return -1;
+}
+
+template<typename T>
+bool LinkedList<T>::contains(const T& value) const {
+    Node* current = head;
+    while (current) {
+        if (current->data == value) {
+            return true;
+        }
+        current = current->next;
+    }
+    return false;
 }

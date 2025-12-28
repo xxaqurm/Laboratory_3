@@ -37,6 +37,7 @@ public:
 
     T& at(const int index) const;
     int find(const T& value) const;
+    bool contains(const T& value) const;
 
     T& front();
     const T& front() const;
@@ -44,7 +45,7 @@ public:
     T& back();
     const T& back() const;
 
-    void display_forward() const;
+    void display() const;
     void display_reverse() const;
 
     int size() const;
@@ -251,7 +252,7 @@ const T& ForwardList<T>::back() const {
 }
 
 template<typename T>
-void ForwardList<T>::display_forward() const {
+void ForwardList<T>::display() const {
     Node* current = head;
     cout << "[";
     while (current) {
@@ -309,6 +310,18 @@ int ForwardList<T>::find(const T& value) const {
     }
 
     return -1;
+}
+
+template<typename T>
+bool ForwardList<T>::contains(const T& value) const {
+    Node* current = head;
+    while (current) {
+        if (current->data == value) {
+            return true;
+        }
+        current = current->next;
+    }
+    return false;
 }
 
 template<typename T>

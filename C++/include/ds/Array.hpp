@@ -39,6 +39,7 @@ public:
     void display() const;
 
     int find(const T& value) const;
+    bool contains(const T& value) const;
     bool remove(const T& value);
 
     T& at(int index) const;
@@ -186,6 +187,16 @@ int Array<T>::find(const T& value) const {
         }
     }
     return -1;
+}
+
+template<typename T>
+bool Array<T>::contains(const T& value) const {
+    for (size_t i = 0; i < size_; i++) {
+        if (data_[i] == value) {
+            return true;
+        }
+    }
+    return false;
 }
 
 template<typename T>

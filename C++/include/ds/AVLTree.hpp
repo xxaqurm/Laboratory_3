@@ -20,7 +20,7 @@ private:
 
     Node* root;
 
-    Node* insert(Node* node, const T& key);
+    Node* push_back(Node* node, const T& key);
     Node* remove(Node* node, const T& key);
     Node* find(Node* node, const T& key);
 
@@ -41,11 +41,13 @@ public:
     AVLTree();
     ~AVLTree();
 
-    void insert(const T& key);
+    void push_back(const T& key);
     void remove(const T& key);
     bool contains(const T& key);
 
-    void BFS();
+    void clear();
+
+    void display();  // BFS
     void DFS();
 
     int size() const;
@@ -54,6 +56,12 @@ public:
 
 template<typename T>
 AVLTree<T>::Node::Node(const T& k) : key(k), left(nullptr), right(nullptr), height(1) {}
+
+template<typename T>
+void AVLTree<T>::clear() {
+    destroy(root);
+    root = nullptr;
+}
 
 template<typename T>
 AVLTree<T>::AVLTree() : root(nullptr) {}
@@ -110,11 +118,11 @@ typename AVLTree<T>::Node* AVLTree<T>::minValue(Node* node) {
 }
 
 template<typename T>
-typename AVLTree<T>::Node* AVLTree<T>::insert(Node* node, const T& key) {
+typename AVLTree<T>::Node* AVLTree<T>::push_back(Node* node, const T& key) {
     if (!node) return new Node(key);
 
-    if (key < node->key) node->left = insert(node->left, key);
-    else if (key > node->key) node->right = insert(node->right, key);
+    if (key < node->key) node->left = push_back(node->left, key);
+    else if (key > node->key) node->right = push_back(node->right, key);
     else return node;
 
     node->height = max(height(node->left), height(node->right)) + 1;
@@ -186,8 +194,8 @@ typename AVLTree<T>::Node* AVLTree<T>::find(Node* node, const T& key) {
 }
 
 template<typename T>
-void AVLTree<T>::insert(const T& key) {
-    root = insert(root, key);
+void AVLTree<T>::push_back(const T& key) {
+    root = push_back(root, key);
 }
 
 template<typename T>
@@ -209,18 +217,18 @@ void AVLTree<T>::dfs(Node* node) {
 }
 
 template<typename T>
-void AVLTree<T>::BFS() {
+void AVLTree<T>::display() {
     if (!root) return;
 
     Queue<Node*> q;
-    q.push(root);
+    q.push_back(root);
 
     while (!q.empty()) {
         Node* n = q.front();
-        q.pop();
+        q.remove(n);
         cout << n->key << " ";
-        if (n->left) q.push(n->left);
-        if (n->right) q.push(n->right);
+        if (n->left) q.push_back(n->left);
+        if (n->right) q.push_back(n->right);
     }
 
     cout << endl;

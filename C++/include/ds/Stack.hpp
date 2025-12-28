@@ -20,23 +20,17 @@ public:
     Stack();
     ~Stack();
 
-    void push(const T& value);
-    void pop();
+    void push_back(const T& value);
+    void remove(const T& value);
     T& top();
     const T& top() const;
     bool empty() const;
     size_t size() const;
     void clear();
 
-    void push_back(const T& value) {
-        push(value);
-    }
-
-    void remove(const T& value) {
-        pop();
-    }
-
     int find(const T& value) const;
+    bool contains(const T& value) const;
+    void display() const;
 
     T& at(const int index) const;
 };
@@ -75,6 +69,28 @@ int Stack<T>::find(const T& value) const {
 }
 
 template<typename T>
+void Stack<T>::display() const {
+    Node* current = head_;
+    while (current) {
+        cout << current->data << " ";
+        current = current->next;
+    }
+    cout << endl;
+}
+
+template<typename T>
+bool Stack<T>::contains(const T& value) const {
+    Node* current = head_;
+    while (current) {
+        if (current->data == value) {
+            return true;
+        }
+        current = current->next;
+    }
+    return false;
+}
+
+template<typename T>
 Stack<T>::Stack() : head_(nullptr), count_(0) {}
 
 template<typename T>
@@ -83,7 +99,7 @@ Stack<T>::~Stack() {
 }
 
 template<typename T>
-void Stack<T>::push(const T& value) {
+void Stack<T>::push_back(const T& value) {
     Node* newNode = new Node(value);
     newNode->next = head_;
     head_ = newNode;
@@ -91,7 +107,7 @@ void Stack<T>::push(const T& value) {
 }
 
 template<typename T>
-void Stack<T>::pop() {
+void Stack<T>::remove(const T& value) {
     if (empty()) throw out_of_range("Stack is empty");
     Node* tmp = head_;
     head_ = head_->next;
@@ -113,7 +129,7 @@ const T& Stack<T>::top() const {
 
 template<typename T>
 bool Stack<T>::empty() const {
-    return count_ == 0;
+    return count_ <= 0;
 }
 
 template<typename T>

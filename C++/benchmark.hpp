@@ -14,7 +14,7 @@ long long benchmark(Func f) {
 }
 
 template <typename DS>
-int runDSBenchmark(const string& operation, const vector<int>& data, int n,
+int runDSBenchmark(const string& operation, vector<int>& data, int n,
                  long long& timeOnce, long long& timeSeries)
 {
     DS ds;
@@ -42,6 +42,8 @@ int runDSBenchmark(const string& operation, const vector<int>& data, int n,
 
         timeOnce = benchmark([&]() { ds.remove(target); });
 
+        data.erase(remove(data.begin(), data.end(), target), data.end());
+
         timeSeries = benchmark([&]() {
             for (auto x : data) ds.remove(x);
         });
@@ -60,12 +62,12 @@ int runHashBenchmark(const string& operation, const vector<int>& data, int n,
     DS ds;
 
     if (operation == "find" || operation == "remove") {
-        for (auto x : data) ds.insert(x);
+        for (auto x : data) ds.push_back(x);
     }
 
     if (operation == "insert") {
         timeSeries = benchmark([&]() {
-            for (auto x : data) ds.insert(x);
+            for (auto x : data) ds.push_back(x);
         });
     }
     else if (operation == "find") {

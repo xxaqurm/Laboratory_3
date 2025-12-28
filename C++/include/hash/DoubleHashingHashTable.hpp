@@ -32,7 +32,7 @@ private:
 
 public:
     DoubleHashingSet(size_t initialCapacity = 11);
-    void insert(const Key& key);
+    void push_back(const Key& key);
     bool contains(const Key& key) const;
     bool remove(const Key& key);
     size_t size() const;
@@ -88,13 +88,13 @@ void DoubleHashingSet<Key>::resize(size_t newCapacity) {
 
     for (size_t i = 0; i < oldTable.size(); ++i) {
         if (oldTable[i].status == SlotStatus::OCCUPIED) {
-            insert(oldTable[i].key);
+            push_back(oldTable[i].key);
         }
     }
 }
 
 template<typename Key>
-void DoubleHashingSet<Key>::insert(const Key& key) {
+void DoubleHashingSet<Key>::push_back(const Key& key) {
     if (static_cast<double>(currentSize) / capacity >= LOAD_FACTOR) {
         resize(capacity * 2 + 1); 
     }

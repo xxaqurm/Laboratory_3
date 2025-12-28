@@ -38,6 +38,7 @@ public:
     Value& get(const Key& key);
     const Value& get(const Key& key) const;
     
+    void display() const;
     bool empty() const;
     bool contains(const Key& key) const;
     void clear();
@@ -56,6 +57,23 @@ bool SeparateChainingHashMap<Key, Value>::contains(const Key& key) const {
         node = node->next;
     }
     return false;
+}
+
+template<typename Key, typename Value>
+void SeparateChainingHashMap<Key, Value>::display() const {
+    for (size_t i = 0; i < capacity_; ++i) {
+        cout << i << ": ";
+        Node* node = table[i];
+        if (!node) {
+            cout << "EMPTY";
+        }
+        while (node) {
+            cout << "(" << node->key << " -> " << node->value << ")";
+            if (node->next) cout << " -> ";
+            node = node->next;
+        }
+        cout << '\n';
+    }
 }
 
 template<typename Key, typename Value>

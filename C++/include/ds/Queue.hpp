@@ -40,6 +40,8 @@ public:
     }
 
     int find(const T& value) const;
+    bool contains(const T& value) const;
+    void display() const;
 
     T& at(const int index) const;
 };
@@ -71,6 +73,28 @@ int Queue<T>::find(const T& value) const {
     }
 
     return -1;
+}
+
+template<typename T>
+void Queue<T>::display() const {
+    Node* current = head_;
+    while (current) {
+        cout << current->data << " ";
+        current = current->next;
+    }
+    cout << endl;
+}
+
+template<typename T>
+bool Queue<T>::contains(const T& value) const {
+    Node* current = head_;
+    while (current) {
+        if (current->data == value) {
+            return true;
+        }
+        current = current->next;
+    }
+    return false;
 }
 
 template<typename T>
