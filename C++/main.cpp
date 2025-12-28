@@ -40,6 +40,7 @@ void help() {
     cout << "  < Exists\n";
     cout << "  > print\n";
     cout << "  < 23\n";
+    cout << "  > exit\n";
 }
 
 int main(int argc, char* argv[]) {
