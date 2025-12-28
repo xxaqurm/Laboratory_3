@@ -3,6 +3,8 @@
 #include <initializer_list>
 #include <stdexcept>
 
+#include "../../json.hpp"
+
 using namespace std;
 
 template<typename T>
@@ -46,6 +48,24 @@ public:
     T& operator[](int index) const;
 
     Array& operator=(const Array& other);
+
+    void to_json(nlohmann::json& j) const {
+        j = nlohmann::json{{"size", size_}, {"capacity", capacity_}, {"data", nlohmann::json::array()}};
+        for (size_t i = 0; i < size_; ++i) {
+            j["data"].push_back(data_[i]);
+        }
+    }
+
+    void from_json(const nlohmann::json& j) {
+        size_ = j.at("size").get<size_t>();
+        capacity_ = j.at("capacity").get<size_t>();
+        delete[] data_;
+        data_ = new T[capacity_];
+        auto arr = j.at("data");
+        for (size_t i = 0; i < arr.size(); ++i) {
+            data_[i] = arr[i].get<T>();
+        }
+    }
 };
 
 template<typename T>

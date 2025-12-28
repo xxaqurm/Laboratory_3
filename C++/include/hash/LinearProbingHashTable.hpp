@@ -2,6 +2,8 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "../../json.hpp"
+
 using namespace std;
 
 enum class State {
@@ -31,7 +33,7 @@ public:
     LinearProbingHashMap(size_t cap = 20);
     ~LinearProbingHashMap();
 
-    void insert(const Key& key, const Value& value);
+    void put(const Key& key, const Value& value);
     bool remove(const Key& key);
     bool contains(const Key& key) const;
     Value get(const Key& key) const;
@@ -39,6 +41,26 @@ public:
     size_t size() const;
     bool isEmpty() const;
     void display() const;
+
+    void to_json(nlohmann::json& j) const {
+        j = nlohmann::json{{"items", nlohmann::json::array()}, {"capacity", capacity}};
+        for (size_t i = 0; i < capacity; ++i) {
+            if (table[i].state == State::OCCUPIED) {
+                j["items"].push_back({{"key", table[i].key}, {"value", table[i].value}});
+            }
+        }
+    }
+
+    void from_json(const nlohmann::json& j) {
+        delete[] table;
+        capacity = j.at("capacity").get<size_t>();
+        table = new HashNode[capacity];
+        count = 0;
+        auto arr = j.at("items");
+        for (size_t i = 0; i < arr.size(); ++i) {
+            put(arr[i]["key"].get<Key>(), arr[i]["value"].get<Value>());
+        }
+    }
 };
 
 template<typename Key, typename Value>
@@ -78,7 +100,7 @@ size_t LinearProbingHashMap<Key, Value>::hashCode(const Key& key) const {
 }
 
 template<typename Key, typename Value>
-void LinearProbingHashMap<Key, Value>::insert(const Key& key, const Value& value) {
+void LinearProbingHashMap<Key, Value>::put(const Key& key, const Value& value) {
     size_t idx = hashCode(key);
     size_t startIdx = idx;
 

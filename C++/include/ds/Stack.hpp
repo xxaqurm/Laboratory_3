@@ -2,6 +2,8 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "../../json.hpp"
+
 using namespace std;
 
 template<typename T>
@@ -33,6 +35,23 @@ public:
     void display() const;
 
     T& at(const int index) const;
+
+    void to_json(nlohmann::json& j) const {
+        j = nlohmann::json{{"data", nlohmann::json::array()}};
+        Node* current = head_;
+        while (current) {
+            j["data"].push_back(current->data);
+            current = current->next;
+        }
+    }
+
+    void from_json(const nlohmann::json& j) {
+        clear();
+        auto arr = j.at("data");
+        for (int i = static_cast<int>(arr.size()) - 1; i >= 0; --i) {
+            push_back(arr[i].get<T>());
+        }
+    }
 };
 
 template<typename T>

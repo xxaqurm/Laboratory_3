@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "../../json.hpp"
+
 using namespace std;
 
 template<typename Key, typename Value>
@@ -44,6 +46,28 @@ public:
     void clear();
 
     SeparateChainingHashMap<Key, Value>& operator=(const SeparateChainingHashMap& other);
+
+    void to_json(nlohmann::json& j) const {
+        j = nlohmann::json{{"items", nlohmann::json::array()}, {"capacity", capacity_}};
+        for (size_t i = 0; i < capacity_; ++i) {
+            Node* node = table[i];
+            while (node) {
+                j["items"].push_back({{"key", node->key}, {"value", node->value}});
+                node = node->next;
+            }
+        }
+    }
+
+    void from_json(const nlohmann::json& j) {
+        clear();
+        capacity_ = j.at("capacity").get<size_t>();
+        table.assign(capacity_, nullptr);
+        size_ = 0;
+        auto arr = j.at("items");
+        for (size_t i = 0; i < arr.size(); ++i) {
+            put(arr[i]["key"].get<Key>(), arr[i]["value"].get<Value>());
+        }
+    }
 };
 
 template<typename Key, typename Value>

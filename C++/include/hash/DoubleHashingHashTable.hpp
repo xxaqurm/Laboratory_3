@@ -1,7 +1,10 @@
 #pragma once
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 #include "../ds/Array.hpp"
+
+#include "../../json.hpp"
 
 using namespace std;
 
@@ -21,7 +24,7 @@ private:
         SlotStatus status = SlotStatus::EMPTY;
     };
 
-    Array<Slot> table;
+    vector<Slot> table;
     size_t currentSize = 0;
     size_t capacity;
 
@@ -38,6 +41,32 @@ public:
     size_t size() const;
     size_t getCapacity() const;
     void display() const;
+
+    void to_json(nlohmann::json& j) const {
+        j = nlohmann::json{{"keys", nlohmann::json::array()}, {"capacity", capacity}};
+        for (size_t i = 0; i < table.size(); ++i) {
+            if (table[i].status == SlotStatus::OCCUPIED) {
+                cout << "Serializing: " << table[i].key << endl;
+                j["keys"].push_back(table[i].key);
+            }
+        }
+    }
+
+    void from_json(const nlohmann::json& j) {
+        clear();
+        capacity = j.at("capacity").get<size_t>();
+        table = vector<Slot>(capacity);
+        currentSize = 0;
+        auto arr = j.at("keys");
+        for (size_t i = 0; i < arr.size(); ++i) {
+            push_back(arr[i].get<Key>());
+        }
+    }
+
+    void clear() {
+        table = vector<Slot>(capacity);
+        currentSize = 0;
+    }
 };
 
 template<typename Key>
@@ -81,8 +110,8 @@ size_t DoubleHashingSet<Key>::probe(const Key& key, size_t i) const {
 
 template<typename Key>
 void DoubleHashingSet<Key>::resize(size_t newCapacity) {
-    Array<Slot> oldTable = table;
-    table = Array<Slot>(newCapacity);
+    vector<Slot> oldTable = table;
+    table = vector<Slot>(newCapacity);
     capacity = newCapacity;
     currentSize = 0;
 

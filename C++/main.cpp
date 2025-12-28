@@ -97,12 +97,12 @@ int main(int argc, char* argv[]) {
             else if (structure == "linearprobinghash") {
                 LinearProbingHashMap<int, int> lph(n);
                 if (operation == "find" || operation == "remove") {
-                    for (auto x : data) lph.insert(x, x + 1);
+                    for (auto x : data) lph.put(x, x + 1);
                 }
 
                 if (operation == "insert") {
                     timeSeries = benchmark([&]() {
-                        for (auto x : data) lph.insert(x, x + 1);
+                        for (auto x : data) lph.put(x, x + 1);
                     });
                 }
                 else if (operation == "find") {
@@ -185,6 +185,12 @@ int main(int argc, char* argv[]) {
             }
             else if (structure == "separatechaininghash") {
                 runInteractiveHash<SeparateChainingHashMap<int,int>>("SeparateChainingHash");
+            }
+            else if (structure == "linearprobinghash") {
+                runInteractiveHash<LinearProbingHashMap<int,int>>("LinearProbingHash");
+            }
+            else if (structure == "doublehash") {
+                runInteractive<DoubleHashingSet<int>>("DoubleHashingHash");
             }
             else {
                 cerr << "Неизвестная структура: " << structure << "\n";

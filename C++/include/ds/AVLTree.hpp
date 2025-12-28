@@ -5,6 +5,8 @@
 #include "Queue.hpp"
 #include "Array.hpp"
 
+#include "../../json.hpp"
+
 using namespace std;
 
 template<typename T>
@@ -52,6 +54,22 @@ public:
 
     int size() const;
     Array<T> toVector() const;
+
+    void to_json(nlohmann::json& j) const {
+        Array<T> arr = toVector();
+        j = nlohmann::json{{"data", nlohmann::json::array()}};
+        for (size_t i = 0; i < arr.size(); ++i) {
+            j["data"].push_back(arr[i]);
+        }
+    }
+
+    void from_json(const nlohmann::json& j) {
+        clear();
+        auto arr = j.at("data");
+        for (size_t i = 0; i < arr.size(); ++i) {
+            push_back(arr[i].get<T>());
+        }
+    }
 };
 
 template<typename T>
