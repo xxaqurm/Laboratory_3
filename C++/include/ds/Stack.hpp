@@ -52,6 +52,33 @@ public:
             push_back(arr[i].get<T>());
         }
     }
+
+    void to_binary(ostream& out) const {
+        size_t sz = count_;
+        out.write(reinterpret_cast<const char*>(&sz), sizeof(sz));
+        
+        T* arr = new T[sz];
+        Node* current = head_;
+        for (size_t i = 0; i < sz; ++i) {
+            arr[sz - 1 - i] = current->data;
+            current = current->next;
+        }
+        out.write(reinterpret_cast<const char*>(arr), sizeof(T) * sz);
+        delete[] arr;
+    }
+
+    void from_binary(istream& in) {
+        clear();
+        size_t sz;
+        in.read(reinterpret_cast<char*>(&sz), sizeof(sz));
+        if (!in || sz == 0) return;
+        T* arr = new T[sz];
+        in.read(reinterpret_cast<char*>(arr), sizeof(T) * sz);
+        for (size_t i = 0; i < sz; ++i) {
+            push_back(arr[i]);
+        }
+        delete[] arr;
+    }
 };
 
 template<typename T>

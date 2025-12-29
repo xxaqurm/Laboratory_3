@@ -69,6 +69,29 @@ public:
             push_back(arr[i].get<T>());
         }
     }
+
+    void to_binary(ostream& out) const {
+        int sz = size();
+        out.write(reinterpret_cast<const char*>(&sz), sizeof(sz));
+        
+        Node* current = head;
+        while (current) {
+            out.write(reinterpret_cast<const char*>(&current->data), sizeof(T));
+            current = current->next;
+        }
+    }
+
+    void from_binary(istream& in) {
+        clear();
+        int sz = 0;
+        in.read(reinterpret_cast<char*>(&sz), sizeof(sz));
+        for (int i = 0; i < sz; ++i) {
+            T value;
+            in.read(reinterpret_cast<char*>(&value), sizeof(T));
+            if (!in) break;
+            push_back(value);
+        }
+    }
 };
 
 template<typename T>

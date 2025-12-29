@@ -63,6 +63,28 @@ public:
             enqueue(arr[i].get<T>());
         }
     }
+
+    void to_binary(ostream& out) const {
+        size_t sz = count_;
+        out.write(reinterpret_cast<const char*>(&sz), sizeof(sz));
+        Node* current = head_;
+        while (current) {
+            out.write(reinterpret_cast<const char*>(&current->data), sizeof(T));
+            current = current->next;
+        }
+    }
+
+    void from_binary(istream& in) {
+        clear();
+        size_t sz = 0;
+        in.read(reinterpret_cast<char*>(&sz), sizeof(sz));
+        for (size_t i = 0; i < sz; ++i) {
+            T value;
+            in.read(reinterpret_cast<char*>(&value), sizeof(T));
+            if (!in) break;
+            enqueue(value);
+        }
+    }
 };
 
 template<typename T>

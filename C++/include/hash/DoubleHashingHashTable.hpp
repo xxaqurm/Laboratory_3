@@ -63,6 +63,34 @@ public:
         }
     }
 
+    void to_binary(ostream& out) const {
+        size_t sz = size();
+        out.write(reinterpret_cast<const char*>(&sz), sizeof(sz));
+        out.write(reinterpret_cast<const char*>(&capacity), sizeof(capacity));
+        
+        for (size_t i = 0; i < table.size(); ++i) {
+            if (table[i].status == SlotStatus::OCCUPIED) {
+                out.write(reinterpret_cast<const char*>(&table[i].key), sizeof(Key));
+            }
+        }
+    }
+
+    void from_binary(istream& in) {
+        clear();
+        size_t sz, loaded_capacity;
+        in.read(reinterpret_cast<char*>(&sz), sizeof(sz));
+        in.read(reinterpret_cast<char*>(&loaded_capacity), sizeof(loaded_capacity));
+        capacity = loaded_capacity;
+        table = vector<Slot>(capacity);
+        currentSize = 0;
+        for (size_t i = 0; i < sz; ++i) {
+            Key key;
+            in.read(reinterpret_cast<char*>(&key), sizeof(Key));
+            if (!in) break;
+            push_back(key);
+        }
+    }
+
     void clear() {
         table = vector<Slot>(capacity);
         currentSize = 0;

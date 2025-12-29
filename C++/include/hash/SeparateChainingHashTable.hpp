@@ -68,6 +68,39 @@ public:
             put(arr[i]["key"].get<Key>(), arr[i]["value"].get<Value>());
         }
     }
+
+    void to_binary(ostream& out) const {
+        // Сохраняем capacity_ и size_
+        out.write(reinterpret_cast<const char*>(&capacity_), sizeof(capacity_));
+        out.write(reinterpret_cast<const char*>(&size_), sizeof(size_));
+        // key, value
+        for (size_t i = 0; i < capacity_; ++i) {
+            Node* node = table[i];
+            while (node) {
+                out.write(reinterpret_cast<const char*>(&node->key), sizeof(Key));
+                out.write(reinterpret_cast<const char*>(&node->value), sizeof(Value));
+                node = node->next;
+            }
+        }
+    }
+
+    void from_binary(istream& in) {
+        clear();
+        size_t loaded_capacity = 0, sz = 0;
+        in.read(reinterpret_cast<char*>(&loaded_capacity), sizeof(loaded_capacity));
+        in.read(reinterpret_cast<char*>(&sz), sizeof(sz));
+        capacity_ = loaded_capacity;
+        table.assign(capacity_, nullptr);
+        size_ = 0;
+        for (size_t i = 0; i < sz; ++i) {
+            Key key;
+            Value value;
+            in.read(reinterpret_cast<char*>(&key), sizeof(Key));
+            in.read(reinterpret_cast<char*>(&value), sizeof(Value));
+            if (!in) break;
+            put(key, value);
+        }
+    }
 };
 
 template<typename Key, typename Value>

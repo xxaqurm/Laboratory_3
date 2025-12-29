@@ -66,6 +66,25 @@ public:
             data_[i] = arr[i].get<T>();
         }
     }
+
+    void to_binary(ostream& out) const {
+        out.write(reinterpret_cast<const char*>(&size_), sizeof(size_));
+        out.write(reinterpret_cast<const char*>(&capacity_), sizeof(capacity_));
+        out.write(reinterpret_cast<const char*>(data_), sizeof(T) * size_);
+    }
+
+    void from_binary(istream& in) {
+        size_t newSize, newCapacity;
+        in.read(reinterpret_cast<char*>(&newSize), sizeof(newSize));
+        in.read(reinterpret_cast<char*>(&newCapacity), sizeof(newCapacity));
+        
+        if (!in) return;
+        delete[] data_;
+        size_ = newSize;
+        capacity_ = newCapacity;
+        data_ = new T[capacity_];
+        in.read(reinterpret_cast<char*>(data_), sizeof(T) * size_);
+    }
 };
 
 template<typename T>

@@ -12,12 +12,20 @@ template <typename DS>
 void runInteractive(const string& name) {
     DS ds;
 
-    ifstream in(name + ".json");
+    // ifstream in(name + ".json");
+    // if (in) {
+    //     json j;
+    //     in >> j;
+    //     ds.from_json(j);
+    //     cout << "< Loaded from " << name << ".json\n";
+    // }
+
+    ifstream in(name + ".bin", ios::binary);
     if (in) {
-        json j;
-        in >> j;
-        ds.from_json(j);
-        cout << "< Loaded from " << name << ".json\n";
+        ds.from_binary(in);
+        cout << "< Loaded from " << name << ".bin\n";
+    } else {
+        cout << "< Failed to load\n";
     }
 
     while (true) {
@@ -76,6 +84,14 @@ void runInteractive(const string& name) {
                 out << j.dump(4);
                 cout << "< Autosaved to " << name << ".json\n";
             }
+
+            ofstream outbin(name + ".bin", ios::binary);
+            if (outbin) {
+                ds.to_binary(outbin);
+                cout << "< Saved to " << name << ".bin\n";
+            } else {
+                cout << "< Failed to save\n";
+            }
             break;
         }
         else {
@@ -97,6 +113,14 @@ void runInteractiveHash(const string& name) {
         map.from_json(j);
         cout << "< Loaded from " << name << ".json\n";
     }
+
+    // ifstream in(name + ".bin", ios::binary);
+    // if (in) {
+    //     ds.from_binary(in);
+    //     cout << "< Loaded from " << name << ".bin\n";
+    // } else {
+    //     cout << "< Failed to load\n";
+    // }
 
     while (true) {
         cout << "> ";
@@ -148,6 +172,14 @@ void runInteractiveHash(const string& name) {
             if (out) {
                 out << j.dump(4);
                 cout << "< Autosaved to " << name << ".json\n";
+            }
+
+            ofstream outbin(name + ".bin", ios::binary);
+            if (outbin) {
+                map.to_binary(outbin);
+                cout << "< Saved to " << name << ".bin\n";
+            } else {
+                cout << "< Failed to save\n";
             }
             break;
         }

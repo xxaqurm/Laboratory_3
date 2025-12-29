@@ -61,6 +61,43 @@ public:
             put(arr[i]["key"].get<Key>(), arr[i]["value"].get<Value>());
         }
     }
+
+    void to_binary(ostream& out) const {
+        // Записываем capacity и count
+        out.write(reinterpret_cast<const char*>(&capacity), sizeof(capacity));
+        out.write(reinterpret_cast<const char*>(&count), sizeof(count));
+        // только OCCUPIED
+        for (size_t i = 0; i < capacity; ++i) {
+            if (table[i].state == State::OCCUPIED) {
+                const char state_marker = 1; // OCCUPIED
+                out.write(&state_marker, 1);
+                out.write(reinterpret_cast<const char*>(&table[i].key), sizeof(Key));
+                out.write(reinterpret_cast<const char*>(&table[i].value), sizeof(Value));
+            }
+        }
+        const char end_marker = 0;
+        out.write(&end_marker, 1); // конец данных
+    }
+
+    void from_binary(istream& in) {
+        delete[] table;
+        in.read(reinterpret_cast<char*>(&capacity), sizeof(capacity));
+        in.read(reinterpret_cast<char*>(&count), sizeof(count));
+        table = new HashNode[capacity];
+        size_t loaded = 0;
+        while (true) {
+            char state_marker = 0;
+            in.read(&state_marker, 1);
+            if (!in || state_marker == 0) break; // конец
+            Key k;
+            Value v;
+            in.read(reinterpret_cast<char*>(&k), sizeof(Key));
+            in.read(reinterpret_cast<char*>(&v), sizeof(Value));
+            put(k, v);
+            ++loaded;
+            if (loaded >= count) break;
+        }
+    }
 };
 
 template<typename Key, typename Value>
@@ -96,7 +133,7 @@ LinearProbingHashMap<Key, Value>::~LinearProbingHashMap() {
 
 template<typename Key, typename Value>
 size_t LinearProbingHashMap<Key, Value>::hashCode(const Key& key) const {
-    return std::hash<Key>{}(key) % capacity;
+    return hash<Key>{}(key) % capacity;
 }
 
 template<typename Key, typename Value>

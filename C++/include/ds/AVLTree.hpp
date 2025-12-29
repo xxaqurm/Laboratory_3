@@ -70,6 +70,26 @@ public:
             push_back(arr[i].get<T>());
         }
     }
+
+    void to_binary(ostream& out) const {
+        Array<T> arr = toVector();
+        size_t sz = arr.size();
+        out.write(reinterpret_cast<const char*>(&sz), sizeof(sz));
+        out.write(reinterpret_cast<const char*>(arr.size() ? &arr[0] : nullptr), sizeof(T) * sz);
+    }
+
+    void from_binary(istream& in) {
+        clear();
+        size_t sz;
+        in.read(reinterpret_cast<char*>(&sz), sizeof(sz));
+        if (!in || sz == 0) return;
+        for (size_t i = 0; i < sz; ++i) {
+            T x;
+            in.read(reinterpret_cast<char*>(&x), sizeof(T));
+            if (!in) break;
+            push_back(x);
+        }
+    }
 };
 
 template<typename T>
