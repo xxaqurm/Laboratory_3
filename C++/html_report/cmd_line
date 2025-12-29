@@ -1,0 +1,1 @@
+genhtml build/coverage_final.info --output-directory html_report

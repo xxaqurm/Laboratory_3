@@ -15,7 +15,7 @@ TEST_EXEC = $(BUILD_DIR)/unit_tests
 TEST_SRCS = $(wildcard $(TEST_DIR)/*.cpp)
 
 # Файлы, которые должны быть исключены из отчета LCOV (Google Test, системные)
-LCOV_EXCLUDE = '/usr/*' '*/$(TEST_DIR)/*'
+LCOV_EXCLUDE = '/usr/*' '*/$(TEST_DIR)/*' '*/json.hpp'
 
 .PHONY: all tests coverage clean report
 
