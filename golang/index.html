@@ -1,0 +1,1771 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>array: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">l1/array/array.go (95.7%)</option>
+				
+				<option value="file1">l1/forwardlist/forwardlist.go (98.0%)</option>
+				
+				<option value="file2">l1/hashtable/hashtabledouble.go (92.7%)</option>
+				
+				<option value="file3">l1/list/list.go (95.1%)</option>
+				
+				<option value="file4">l1/main.go (0.0%)</option>
+				
+				<option value="file5">l1/queue/queue.go (97.1%)</option>
+				
+				<option value="file6">l1/stack/stack.go (97.1%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package array
+
+import (
+        "bufio"
+        "encoding/binary"
+        "errors"
+        "io"
+        "os"
+)
+
+type Array struct {
+        memorySize int
+        size       int
+        memory     []string
+}
+
+func NewArray() *Array <span class="cov8" title="1">{
+        arr := Array{0, 0, nil}
+        arr.memory = make([]string, 0)
+        return &amp;arr
+}</span>
+
+func (this *Array) Add(key string) <span class="cov8" title="1">{
+        if this.memorySize &lt; this.size+1 </span><span class="cov8" title="1">{
+                oldMemory := this.memory
+                if this.size == 0 </span><span class="cov8" title="1">{
+                        this.memorySize = 1
+                }</span> else<span class="cov8" title="1"> {
+                        this.memorySize = this.size * 2
+                }</span>
+                <span class="cov8" title="1">this.memory = make([]string, this.memorySize)
+                for i := 0; i &lt; this.size; i++ </span><span class="cov8" title="1">{
+                        this.memory[i] = oldMemory[i]
+                }</span>
+        }
+        <span class="cov8" title="1">this.memory[this.size] = key
+        this.size++</span>
+}
+
+func (this *Array) Insert(key string, index int) <span class="cov8" title="1">{
+        if index &gt; this.size || index &lt; 0 </span><span class="cov8" title="1">{
+                return
+        }</span>
+
+        <span class="cov8" title="1">if this.memorySize &lt; this.size+1 </span><span class="cov8" title="1">{
+                oldMemory := this.memory
+                if this.size == 0 </span><span class="cov0" title="0">{
+                        this.memorySize = 1
+                }</span> else<span class="cov8" title="1"> {
+                        this.memorySize = this.size * 2
+                }</span>
+                <span class="cov8" title="1">this.memory = make([]string, this.memorySize)
+                for i := 0; i &lt; index; i++ </span><span class="cov8" title="1">{
+                        this.memory[i] = oldMemory[i]
+                }</span>
+                <span class="cov8" title="1">this.memory[index] = key
+                for i := index + 1; i &lt; this.size+1; i++ </span><span class="cov8" title="1">{
+                        this.memory[i] = oldMemory[i-1]
+                }</span>
+        } else<span class="cov8" title="1"> {
+                for i := this.size; i &gt; index; i-- </span><span class="cov0" title="0">{
+                        this.memory[i] = this.memory[i-1]
+                }</span>
+                <span class="cov8" title="1">this.memory[index] = key</span>
+        }
+        <span class="cov8" title="1">this.size++</span>
+}
+
+func (this *Array) Get(index int) (string, error) <span class="cov8" title="1">{
+        if index &gt;= this.size || index &lt; 0 </span><span class="cov8" title="1">{
+                return "", errors.New("out of range")
+        }</span>
+        <span class="cov8" title="1">return this.memory[index], nil</span>
+}
+
+func (this *Array) Remove(index int) <span class="cov8" title="1">{
+        if index &gt;= this.size || index &lt; 0 </span><span class="cov8" title="1">{
+                return
+        }</span>
+
+        <span class="cov8" title="1">for i := index; i &lt; this.size-1; i++ </span><span class="cov8" title="1">{
+                this.memory[i] = this.memory[i+1]
+        }</span>
+        <span class="cov8" title="1">this.size--</span>
+}
+
+func (this *Array) Change(index int, key string) <span class="cov8" title="1">{
+        if index &gt;= this.size || index &lt; 0 </span><span class="cov8" title="1">{
+                return
+        }</span>
+        <span class="cov8" title="1">this.memory[index] = key</span>
+}
+
+func (this *Array) ToString() string <span class="cov8" title="1">{
+        if this.size == 0 </span><span class="cov8" title="1">{
+                return ""
+        }</span>
+
+        <span class="cov8" title="1">a := ""
+        for i := 0; i &lt; this.size-1; i++ </span><span class="cov8" title="1">{
+                a += this.memory[i] + " "
+        }</span>
+        <span class="cov8" title="1">a += this.memory[this.size-1]
+        return a</span>
+}
+
+func (this *Array) GetSize() int <span class="cov8" title="1">{
+        return this.size
+}</span>
+
+func ReadArrayFromFile(fileStr string) (*Array, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">scanner := bufio.NewScanner(file)
+        scanner.Split(bufio.ScanWords)
+        arr := NewArray()
+        for scanner.Scan() </span><span class="cov8" title="1">{
+                arr.Add(scanner.Text())
+        }</span>
+        <span class="cov8" title="1">file.Close()
+        return arr, nil</span>
+}
+
+func ReadArrayFromFileBinary(fileStr string) (*Array, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">arr := NewArray()
+        var stringSize int32
+        for </span><span class="cov8" title="1">{
+                err := binary.Read(file, binary.LittleEndian, &amp;stringSize)
+                if err == io.EOF </span><span class="cov8" title="1">{
+                        break</span>
+                } else<span class="cov8" title="1"> if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">buf := make([]byte, stringSize)
+                n, err := file.Read(buf)
+                if n != int(stringSize) || err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">arr.Add(string(buf))</span>
+        }
+        <span class="cov8" title="1">file.Close()
+        return arr, nil</span>
+}
+
+func (this *Array) WriteToFile(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">writer := bufio.NewWriter(file)
+        writer.WriteString(this.ToString())
+        writer.Flush()
+        file.Close()
+        return nil</span>
+}
+
+func (this *Array) WriteToFileBinary(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">for i := 0; i &lt; this.size; i++ </span><span class="cov8" title="1">{
+                binary.Write(file, binary.LittleEndian, int32(len(this.memory[i])))
+                file.Write([]byte(this.memory[i]))
+        }</span>
+        <span class="cov8" title="1">file.Close()
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package forwardlist
+
+import (
+        "bufio"
+        "encoding/binary"
+        "io"
+        "os"
+)
+
+type ForwardListNode struct {
+        Key  string
+        Next *ForwardListNode
+}
+
+type ForwardList struct {
+        Head *ForwardListNode
+}
+
+func (this *ForwardList) Insert(key string, index int) <span class="cov8" title="1">{
+        if index == 0 </span><span class="cov8" title="1">{
+                this.AddHead(key)
+                return
+        }</span>
+
+        <span class="cov8" title="1">node := this.Head
+        for i := 0; i &lt; index-1; i++ </span><span class="cov8" title="1">{
+                if node == nil </span><span class="cov8" title="1">{
+                        break</span>
+                }
+                <span class="cov8" title="1">node = node.Next</span>
+        }
+        <span class="cov8" title="1">if node == nil </span><span class="cov8" title="1">{
+                return
+        }</span>
+        <span class="cov8" title="1">newNode := &amp;ForwardListNode{key, nil}
+        newNode.Next = node.Next
+        node.Next = newNode</span>
+}
+
+func (this *ForwardList) Remove(index int) bool <span class="cov8" title="1">{
+        if index == 0 </span><span class="cov8" title="1">{
+                return this.RemoveHead()
+        }</span>
+
+        <span class="cov8" title="1">node := this.Head
+        for i := 0; i &lt; index-1; i++ </span><span class="cov8" title="1">{
+                if node == nil </span><span class="cov8" title="1">{
+                        break</span>
+                }
+                <span class="cov8" title="1">node = node.Next</span>
+        }
+        <span class="cov8" title="1">if node == nil || node.Next == nil </span><span class="cov8" title="1">{
+                return false
+        }</span>
+        <span class="cov8" title="1">node.Next = node.Next.Next
+        return true</span>
+}
+
+func (this *ForwardList) AddTail(key string) <span class="cov8" title="1">{
+        if this.Head == nil </span><span class="cov8" title="1">{
+                this.Head = &amp;ForwardListNode{key, nil}
+                return
+        }</span>
+        <span class="cov8" title="1">node := this.Head
+        for node.Next != nil </span><span class="cov8" title="1">{
+                node = node.Next
+        }</span>
+        <span class="cov8" title="1">node.Next = &amp;ForwardListNode{key, nil}</span>
+}
+
+func (this *ForwardList) AddHead(key string) <span class="cov8" title="1">{
+        if this.Head == nil </span><span class="cov8" title="1">{
+                this.Head = &amp;ForwardListNode{key, nil}
+                return
+        }</span>
+        <span class="cov8" title="1">node := &amp;ForwardListNode{key, nil}
+        node.Next = this.Head
+        this.Head = node</span>
+}
+
+func (this *ForwardList) RemoveTail() bool <span class="cov8" title="1">{
+        if this.Head == nil </span><span class="cov8" title="1">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">node := this.Head
+        if node.Next == nil </span><span class="cov0" title="0">{
+                return this.RemoveHead()
+        }</span>
+        <span class="cov8" title="1">for node.Next.Next != nil </span><span class="cov8" title="1">{
+                node = node.Next
+        }</span>
+        <span class="cov8" title="1">node.Next = nil
+        return true</span>
+}
+
+func (this *ForwardList) RemoveHead() bool <span class="cov8" title="1">{
+        if this.Head == nil </span><span class="cov8" title="1">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">this.Head = this.Head.Next
+        return true</span>
+}
+
+func (this *ForwardList) PrintFromHead() string <span class="cov8" title="1">{
+        node := this.Head
+        if node == nil </span><span class="cov8" title="1">{
+                return ""
+        }</span>
+        <span class="cov8" title="1">a := ""
+        for node.Next != nil </span><span class="cov8" title="1">{
+                a += node.Key + " "
+                node = node.Next
+        }</span>
+        <span class="cov8" title="1">a += node.Key
+        return a</span>
+}
+
+func printFromTailRec(s *string, node *ForwardListNode) <span class="cov8" title="1">{
+        if node == nil </span><span class="cov8" title="1">{
+                return
+        }</span>
+        <span class="cov8" title="1">printFromTailRec(s, node.Next)
+        *s += node.Key + " "</span>
+}
+
+func (this *ForwardList) PrintFromTail() string <span class="cov8" title="1">{
+        s := ""
+        printFromTailRec(&amp;s, this.Head)
+        return s
+}</span>
+
+func (this *ForwardList) RemoveKey(key string, num int) bool <span class="cov8" title="1">{
+        if num &lt; 1 || this.Head == nil </span><span class="cov8" title="1">{
+                return false
+        }</span>
+        <span class="cov8" title="1">n := 1
+        node := this.Head
+        if node.Key == key </span><span class="cov8" title="1">{
+                if num == n </span><span class="cov8" title="1">{
+                        return this.RemoveHead()
+                }</span>
+                <span class="cov8" title="1">n += 1</span>
+        }
+        <span class="cov8" title="1">for node.Next != nil </span><span class="cov8" title="1">{
+                if node.Next.Key == key </span><span class="cov8" title="1">{
+                        if n == num </span><span class="cov8" title="1">{
+                                node.Next = node.Next.Next
+                                return true
+                        }</span>
+                        <span class="cov8" title="1">n++</span>
+                }
+                <span class="cov8" title="1">node = node.Next</span>
+        }
+        <span class="cov8" title="1">return false</span>
+}
+
+func (this *ForwardList) Find(key string, num int) *ForwardListNode <span class="cov8" title="1">{
+        if num &lt; 1 </span><span class="cov8" title="1">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">n := 1
+        node := this.Head
+        for node != nil </span><span class="cov8" title="1">{
+                if node.Key == key </span><span class="cov8" title="1">{
+                        if n == num </span><span class="cov8" title="1">{
+                                return node
+                        }</span>
+                        <span class="cov8" title="1">n++</span>
+                }
+                <span class="cov8" title="1">node = node.Next</span>
+        }
+        <span class="cov8" title="1">return nil</span>
+}
+
+func ReadForwardListFromFile(fileStr string) (*ForwardList, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">scanner := bufio.NewScanner(file)
+        scanner.Split(bufio.ScanWords)
+        fl := &amp;ForwardList{}
+        var tail *ForwardListNode
+        for scanner.Scan() </span><span class="cov8" title="1">{
+                if fl.Head == nil </span><span class="cov8" title="1">{
+                        fl.AddHead(scanner.Text())
+                        tail = fl.Head
+                }</span> else<span class="cov8" title="1"> {
+                        tail.Next = &amp;ForwardListNode{scanner.Text(), nil}
+                        tail = tail.Next
+                }</span>
+        }
+        <span class="cov8" title="1">file.Close()
+        return fl, nil</span>
+}
+
+func ReadForwardListFromFileBinary(fileStr string) (*ForwardList, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">fl := &amp;ForwardList{nil}
+        var stringSize int32
+        var tail *ForwardListNode = nil
+        for </span><span class="cov8" title="1">{
+                err := binary.Read(file, binary.LittleEndian, &amp;stringSize)
+                if err == io.EOF </span><span class="cov8" title="1">{
+                        break</span>
+                } else<span class="cov8" title="1"> if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">buf := make([]byte, stringSize)
+                n, err := file.Read(buf)
+                if n != int(stringSize) || err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">if fl.Head == nil </span><span class="cov8" title="1">{
+                        fl.AddHead(string(buf))
+                        tail = fl.Head
+                }</span> else<span class="cov8" title="1"> {
+                        tail.Next = &amp;ForwardListNode{string(buf), nil}
+                        tail = tail.Next
+                }</span>
+        }
+        <span class="cov8" title="1">file.Close()
+        return fl, nil</span>
+}
+
+func (this *ForwardList) WriteToFile(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">writer := bufio.NewWriter(file)
+        writer.WriteString(this.PrintFromHead())
+        writer.Flush()
+        file.Close()
+        return nil</span>
+}
+
+func (this *ForwardList) WriteToFileBinary(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">node := this.Head
+        for node != nil </span><span class="cov8" title="1">{
+                binary.Write(file, binary.LittleEndian, int32(len(node.Key)))
+                file.Write([]byte(node.Key))
+                node = node.Next
+        }</span>
+        <span class="cov8" title="1">file.Close()
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package hashtable
+
+import (
+        "bufio"
+        "encoding/binary"
+        "errors"
+        "io"
+        "os"
+        "strconv"
+        "strings"
+)
+
+const max_load float32 = 0.75
+
+type entry struct {
+        key     int
+        value   int
+        deleted bool
+}
+
+type HashTableDouble struct {
+        size     int
+        capacity int
+        table    []*entry
+}
+
+func NewHashTable(capacity int) *HashTableDouble <span class="cov8" title="1">{
+        if capacity &lt;= 1 </span><span class="cov8" title="1">{
+                capacity = 3
+        }</span>
+        <span class="cov8" title="1">return &amp;HashTableDouble{0, capacity, make([]*entry, capacity)}</span>
+}
+
+func (this *HashTableDouble) rehash() <span class="cov8" title="1">{
+        oldTable := this.table
+        oldCapacity := this.capacity
+        this.size = 0
+
+        //find new prime capacity
+        this.capacity = this.capacity * 2
+        if this.capacity%2 == 0 </span><span class="cov8" title="1">{
+                this.capacity++
+        }</span>
+        <span class="cov8" title="1">for </span><span class="cov8" title="1">{
+                isPrime := true
+                for i := 3; i*i &lt;= this.capacity; i += 2 </span><span class="cov8" title="1">{
+                        if this.capacity%i == 0 </span><span class="cov8" title="1">{
+                                isPrime = false
+                                break</span>
+                        }
+                }
+
+                <span class="cov8" title="1">if isPrime </span><span class="cov8" title="1">{
+                        break</span>
+                }
+                <span class="cov8" title="1">this.capacity += 2</span>
+        }
+
+        <span class="cov8" title="1">this.table = make([]*entry, this.capacity)
+        for i := 0; i &lt; oldCapacity; i++ </span><span class="cov8" title="1">{
+                if oldTable[i] != nil &amp;&amp; !oldTable[i].deleted </span><span class="cov8" title="1">{
+                        this.Insert(oldTable[i].key, oldTable[i].value)
+                }</span>
+        }
+}
+
+func (this *HashTableDouble) hash1(key int) int <span class="cov8" title="1">{
+        x := float32(key) * 0.6180339887
+        if x &lt; 0 </span><span class="cov8" title="1">{
+                x = -x
+        }</span>
+        <span class="cov8" title="1">xx := x - float32(int(x))
+        return int(xx * float32(this.capacity))</span>
+}
+
+func (this *HashTableDouble) hash2(key int) int <span class="cov8" title="1">{
+        return (key % (this.capacity - 1)) + 1
+}</span>
+
+func (this *HashTableDouble) Contains(key int) bool <span class="cov8" title="1">{
+        h1 := this.hash1(key)
+        h2 := this.hash2(key)
+
+        for i := 0; i &lt; this.capacity; i++ </span><span class="cov8" title="1">{
+                h := (h1 + i*h2) % this.capacity
+                if this.table[h] == nil </span><span class="cov8" title="1">{
+                        return false
+                }</span>
+                <span class="cov8" title="1">if this.table[h].key == key </span><span class="cov8" title="1">{
+                        return !this.table[h].deleted
+                }</span>
+        }
+        <span class="cov0" title="0">return false</span>
+}
+
+func (this *HashTableDouble) Insert(key int, value int) <span class="cov8" title="1">{
+        if (float32(this.size) / float32(this.capacity)) &gt; max_load </span><span class="cov8" title="1">{
+                this.rehash()
+        }</span>
+        <span class="cov8" title="1">h1 := this.hash1(key)
+        h2 := this.hash2(key)
+
+        for i := 0; i &lt; this.capacity; i++ </span><span class="cov8" title="1">{
+                h := (h1 + i*h2) % this.capacity
+                if this.table[h] == nil </span><span class="cov8" title="1">{
+                        this.table[h] = &amp;entry{key, value, false}
+                        this.size++
+                        return
+                }</span> else<span class="cov8" title="1"> if this.table[h].key == key </span><span class="cov8" title="1">{
+                        this.table[h].deleted = false
+                        this.table[h].value = value
+                        return
+                }</span>
+        }
+        <span class="cov0" title="0">this.rehash()
+        this.Insert(key, value)</span>
+}
+
+func (this *HashTableDouble) Remove(key int) bool <span class="cov8" title="1">{
+        h1 := this.hash1(key)
+        h2 := this.hash2(key)
+
+        for i := 0; i &lt; this.capacity; i++ </span><span class="cov8" title="1">{
+                h := (h1 + i*h2) % this.capacity
+                if this.table[h] == nil </span><span class="cov8" title="1">{
+                        return false
+                }</span> else<span class="cov8" title="1"> if this.table[h].key == key </span><span class="cov8" title="1">{
+                        if this.table[h].deleted </span><span class="cov8" title="1">{
+                                return false
+                        }</span>
+                        <span class="cov8" title="1">this.table[h].deleted = true
+                        return true</span>
+                }
+        }
+        <span class="cov0" title="0">return false</span>
+}
+
+func (this *HashTableDouble) Get(key int) (int, error) <span class="cov8" title="1">{
+        h1 := this.hash1(key)
+        h2 := this.hash2(key)
+
+        for i := 0; i &lt; this.capacity; i++ </span><span class="cov8" title="1">{
+                h := (h1 + i*h2) % this.capacity
+                if this.table[h] == nil </span><span class="cov8" title="1">{
+                        return 0, errors.New("out of range")
+                }</span> else<span class="cov8" title="1"> if this.table[h].key == key </span><span class="cov8" title="1">{
+                        if this.table[h].deleted </span><span class="cov8" title="1">{
+                                return 0, errors.New("deleted")
+                        }</span> else<span class="cov8" title="1"> {
+                                return this.table[h].value, nil
+                        }</span>
+                }
+        }
+        <span class="cov0" title="0">return 0, errors.New("out of range")</span>
+}
+
+func (this *HashTableDouble) ToString() string <span class="cov8" title="1">{
+        result := ""
+        for i := 0; i &lt; this.capacity; i++ </span><span class="cov8" title="1">{
+                if this.table[i] != nil &amp;&amp; !this.table[i].deleted </span><span class="cov8" title="1">{
+                        result += strconv.Itoa(this.table[i].key) + " : " + strconv.Itoa(this.table[i].value) + "\n"
+                }</span>
+        }
+        <span class="cov8" title="1">return result</span>
+}
+
+func (this *HashTableDouble) WriteToFile(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">writer := bufio.NewWriter(file)
+        for i := 0; i &lt; this.capacity; i++ </span><span class="cov8" title="1">{
+                if this.table[i] != nil &amp;&amp; !this.table[i].deleted </span><span class="cov8" title="1">{
+                        writer.WriteString(strconv.Itoa(this.table[i].key) + ":" + strconv.Itoa(this.table[i].value) + " ")
+                }</span>
+        }
+        <span class="cov8" title="1">writer.Flush()
+        file.Close()
+        return nil</span>
+}
+
+func (this *HashTableDouble) WriteToFileBinary(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">for i := 0; i &lt; this.capacity; i++ </span><span class="cov8" title="1">{
+                if this.table[i] != nil &amp;&amp; !this.table[i].deleted </span><span class="cov8" title="1">{
+                        binary.Write(file, binary.LittleEndian, int32(this.table[i].key))
+                        binary.Write(file, binary.LittleEndian, int32(this.table[i].value))
+                }</span>
+        }
+        <span class="cov8" title="1">file.Close()
+        return nil</span>
+}
+
+func ReadHashTableFromFile(fileStr string) (*HashTableDouble, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">scanner := bufio.NewScanner(file)
+        scanner.Split(bufio.ScanWords)
+        ht := NewHashTable(3)
+        for scanner.Scan() </span><span class="cov8" title="1">{
+                s := strings.Split(scanner.Text(), ":")
+                if len(s) != 2 </span><span class="cov0" title="0">{
+                        return nil, errors.New("bad file")
+                }</span>
+                <span class="cov8" title="1">key, err := strconv.Atoi(s[0])
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">val, err := strconv.Atoi(s[1])
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">ht.Insert(key, val)</span>
+        }
+        <span class="cov8" title="1">file.Close()
+        return ht, nil</span>
+}
+
+func ReadHashTableFromFileBinary(fileStr string) (*HashTableDouble, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">ht := NewHashTable(3)
+        var key int32
+        var val int32
+        for </span><span class="cov8" title="1">{
+                err := binary.Read(file, binary.LittleEndian, &amp;key)
+                if err == io.EOF </span><span class="cov8" title="1">{
+                        break</span>
+                } else<span class="cov8" title="1"> if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">err = binary.Read(file, binary.LittleEndian, &amp;val)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">ht.Insert(int(key), int(val))</span>
+        }
+        <span class="cov8" title="1">file.Close()
+        return ht, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package list
+
+import (
+        "bufio"
+        "encoding/binary"
+        "io"
+        "os"
+)
+
+type ListNode struct {
+        Key  string
+        Next *ListNode
+        Prev *ListNode
+}
+
+type List struct {
+        Tail *ListNode
+        Head *ListNode
+}
+
+func (this *List) Insert(key string, index int) <span class="cov8" title="1">{
+        if index == 0 </span><span class="cov8" title="1">{
+                this.AddHead(key)
+                return
+        }</span>
+
+        <span class="cov8" title="1">node := this.Head
+        for i := 0; i &lt; index-1; i++ </span><span class="cov8" title="1">{
+                if node == nil </span><span class="cov8" title="1">{
+                        break</span>
+                }
+                <span class="cov8" title="1">node = node.Next</span>
+        }
+        <span class="cov8" title="1">if node == nil </span><span class="cov8" title="1">{
+                return
+        }</span>
+        <span class="cov8" title="1">if node == this.Tail </span><span class="cov0" title="0">{
+                this.AddTail(key)
+                return
+        }</span>
+        <span class="cov8" title="1">newNode := &amp;ListNode{key, nil, nil}
+        newNode.Next = node.Next
+        newNode.Prev = node
+        node.Next = newNode
+        newNode.Next.Prev = node.Prev</span>
+}
+
+func (this *List) Remove(index int) bool <span class="cov8" title="1">{
+        if index == 0 </span><span class="cov8" title="1">{
+                return this.RemoveHead()
+        }</span>
+
+        <span class="cov8" title="1">node := this.Head
+        for i := 0; i &lt; index-1; i++ </span><span class="cov8" title="1">{
+                if node == nil </span><span class="cov8" title="1">{
+                        break</span>
+                }
+                <span class="cov8" title="1">node = node.Next</span>
+        }
+        <span class="cov8" title="1">if node == nil </span><span class="cov8" title="1">{
+                return false
+        }</span>
+        <span class="cov8" title="1">if node.Next == this.Tail </span><span class="cov8" title="1">{
+                return this.RemoveTail()
+        }</span>
+        <span class="cov8" title="1">toDelete := node.Next
+        if toDelete != nil </span><span class="cov0" title="0">{
+                node.Next = toDelete.Next
+                toDelete.Next.Prev = node
+                return true
+        }</span>
+        <span class="cov8" title="1">return false</span>
+}
+
+func (this *List) AddTail(key string) <span class="cov8" title="1">{
+        node := &amp;ListNode{key, nil, nil}
+        if this.Tail == nil </span><span class="cov8" title="1">{
+                this.Tail = node
+                this.Head = node
+                return
+        }</span>
+        <span class="cov8" title="1">node.Prev = this.Tail
+        this.Tail.Next = node
+        this.Tail = node</span>
+}
+
+func (this *List) AddHead(key string) <span class="cov8" title="1">{
+        node := &amp;ListNode{key, nil, nil}
+        if this.Tail == nil </span><span class="cov8" title="1">{
+                this.Tail = node
+                this.Head = node
+                return
+        }</span>
+        <span class="cov8" title="1">node.Next = this.Head
+        this.Head.Prev = node
+        this.Head = node</span>
+}
+
+func (this *List) RemoveTail() bool <span class="cov8" title="1">{
+        if this.Tail == nil </span><span class="cov8" title="1">{
+                return false
+        }</span>
+        <span class="cov8" title="1">if this.Tail == this.Head </span><span class="cov8" title="1">{
+                this.Tail = nil
+                this.Head = nil
+                return true
+        }</span>
+        <span class="cov8" title="1">this.Tail = this.Tail.Prev
+        this.Tail.Next = nil
+        return true</span>
+}
+
+func (this *List) RemoveHead() bool <span class="cov8" title="1">{
+        if this.Head == nil </span><span class="cov8" title="1">{
+                return false
+        }</span>
+        <span class="cov8" title="1">if this.Tail == this.Head </span><span class="cov8" title="1">{
+                this.Tail = nil
+                this.Head = nil
+                return true
+        }</span>
+        <span class="cov8" title="1">this.Head = this.Head.Next
+        this.Head.Prev = nil
+        return true</span>
+}
+
+func (this *List) PrintFromHead() string <span class="cov8" title="1">{
+        node := this.Head
+        if node == nil </span><span class="cov8" title="1">{
+                return ""
+        }</span>
+        <span class="cov8" title="1">a := ""
+        for node.Next != nil </span><span class="cov8" title="1">{
+                a += node.Key + " "
+                node = node.Next
+        }</span>
+        <span class="cov8" title="1">a += node.Key
+        return a</span>
+}
+
+func (this *List) PrintFromTail() string <span class="cov8" title="1">{
+        node := this.Tail
+        if node == nil </span><span class="cov8" title="1">{
+                return ""
+        }</span>
+        <span class="cov8" title="1">a := ""
+        for node.Prev != nil </span><span class="cov8" title="1">{
+                a += node.Key + " "
+                node = node.Prev
+        }</span>
+        <span class="cov8" title="1">a += node.Key
+        return a</span>
+}
+
+func (this *List) RemoveKey(key string, num int) bool <span class="cov8" title="1">{
+        if num &lt; 1 </span><span class="cov8" title="1">{
+                return false
+        }</span>
+        <span class="cov8" title="1">n := 1
+        node := this.Head
+        for node != nil </span><span class="cov8" title="1">{
+                if node.Key == key </span><span class="cov8" title="1">{
+                        if n == num </span><span class="cov8" title="1">{
+                                if node == this.Tail </span><span class="cov8" title="1">{
+                                        return this.RemoveTail()
+                                }</span> else<span class="cov8" title="1"> if node == this.Head </span><span class="cov0" title="0">{
+                                        return this.RemoveHead()
+                                }</span> else<span class="cov8" title="1"> {
+                                        node.Prev.Next = node.Next
+                                        node.Next.Prev = node.Prev
+                                        node.Next = node.Next.Next
+                                        return true
+                                }</span>
+                        }
+                        <span class="cov8" title="1">n++</span>
+                }
+                <span class="cov8" title="1">node = node.Next</span>
+        }
+        <span class="cov8" title="1">return false</span>
+}
+
+func (this *List) Find(key string, num int) *ListNode <span class="cov8" title="1">{
+        if num &lt; 1 </span><span class="cov8" title="1">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">n := 1
+        node := this.Head
+        for node != nil </span><span class="cov8" title="1">{
+                if node.Key == key </span><span class="cov8" title="1">{
+                        if n == num </span><span class="cov8" title="1">{
+                                return node
+                        }</span>
+                        <span class="cov8" title="1">n++</span>
+                }
+                <span class="cov8" title="1">node = node.Next</span>
+        }
+        <span class="cov8" title="1">return nil</span>
+}
+
+func ReadListFromFile(fileStr string) (*List, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">l := &amp;List{}
+        scanner := bufio.NewScanner(file)
+        scanner.Split(bufio.ScanWords)
+        for scanner.Scan() </span><span class="cov8" title="1">{
+                l.AddTail(scanner.Text())
+        }</span>
+        <span class="cov8" title="1">file.Close()
+        return l, nil</span>
+}
+
+func ReadListFromFileBinary(fileStr string) (*List, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">fl := &amp;List{nil, nil}
+        var stringSize int32
+        for </span><span class="cov8" title="1">{
+                err := binary.Read(file, binary.LittleEndian, &amp;stringSize)
+                if err == io.EOF </span><span class="cov8" title="1">{
+                        break</span>
+                } else<span class="cov8" title="1"> if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">buf := make([]byte, stringSize)
+                n, err := file.Read(buf)
+                if n != int(stringSize) || err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">fl.AddTail(string(buf))</span>
+        }
+        <span class="cov8" title="1">file.Close()
+        return fl, nil</span>
+}
+
+func (this *List) WriteToFile(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">writer := bufio.NewWriter(file)
+        writer.WriteString(this.PrintFromHead())
+        writer.Flush()
+        file.Close()
+        return nil</span>
+}
+
+func (this *List) WriteToFileBinary(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">node := this.Head
+        for node != nil </span><span class="cov8" title="1">{
+                binary.Write(file, binary.LittleEndian, int32(len(node.Key)))
+                file.Write([]byte(node.Key))
+                node = node.Next
+        }</span>
+        <span class="cov8" title="1">file.Close()
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package main
+
+import (
+        "fmt"
+        . "l1/array"
+        . "l1/forwardlist"
+        . "l1/hashtable"
+        . "l1/list"
+        . "l1/queue"
+        . "l1/stack"
+        "os"
+        "strconv"
+)
+
+func printHelp() <span class="cov0" title="0">{
+        fmt.Println("Usage: ./l1 [FILE] [COMMAND] [ARGUMENTS]")
+}</span>
+
+func main() <span class="cov0" title="0">{
+        argc := len(os.Args)
+        argv := os.Args
+
+        if argc &lt; 3 </span><span class="cov0" title="0">{
+                printHelp()
+                return
+        }</span>
+
+        <span class="cov0" title="0">file := argv[1]
+        switch argv[2][0] </span>{
+        case 'A':<span class="cov0" title="0">
+                arr, err := ReadArrayFromFile(file)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("file bad")
+                        break</span>
+                }
+                <span class="cov0" title="0">switch argv[2][1:] </span>{
+                case "ADD":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">arr.Add(argv[3])
+
+                        arr.WriteToFile(file)</span>
+                case "INSERT":<span class="cov0" title="0">
+                        if argc != 5 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">index, err := strconv.Atoi(argv[4])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Индекс не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">arr.Insert(argv[3], index)
+
+                        arr.WriteToFile(file)</span>
+                case "GET":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">index, err := strconv.Atoi(argv[3])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Индекс не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fmt.Println(arr.Get(index))</span>
+                case "REMOVE":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">index, err := strconv.Atoi(argv[3])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Индекс не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">arr.Remove(index)
+
+                        arr.WriteToFile(file)</span>
+                case "CHANGE":<span class="cov0" title="0">
+                        if argc != 5 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">index, err := strconv.Atoi(argv[3])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Индекс не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">arr.Change(index, argv[4])
+
+                        arr.WriteToFile(file)</span>
+                case "SIZE":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fmt.Println(arr.GetSize())</span>
+                case "PRINT":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fmt.Println(arr.ToString())</span>
+                default:<span class="cov0" title="0">
+                        fmt.Println("Неизвестная операция")</span>
+                }
+        case 'F':<span class="cov0" title="0">
+                fl, err := ReadForwardListFromFile(file)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("file bad")
+                        break</span>
+                }
+                <span class="cov0" title="0">switch argv[2][1:] </span>{
+                case "ADDTAIL":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.AddTail(argv[3])
+
+                        fl.WriteToFile(file)</span>
+                case "ADDHEAD":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.AddHead(argv[3])
+
+                        fl.WriteToFile(file)</span>
+                case "INSERT":<span class="cov0" title="0">
+                        if argc != 5 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">index, err := strconv.Atoi(argv[4])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Индекс не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.Insert(argv[3], index)
+
+                        fl.WriteToFile(file)</span>
+                case "REMOVETAIL":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.RemoveTail()
+
+                        fl.WriteToFile(file)</span>
+                case "REMOVEHEAD":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.RemoveHead()
+
+                        fl.WriteToFile(file)</span>
+                case "REMOVEINDEX":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">index, err := strconv.Atoi(argv[3])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Индекс не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.Remove(index)
+
+                        fl.WriteToFile(file)</span>
+                case "PRINT":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fmt.Printf("С головы: %s\nС хвоста %s\n", fl.PrintFromHead(), fl.PrintFromTail())</span>
+                case "REMOVE":<span class="cov0" title="0">
+                        if argc != 5 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">num, err := strconv.Atoi(argv[4])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Номер вхождения не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.RemoveKey(argv[3], num)
+
+                        fl.WriteToFile(file)</span>
+                case "FIND":<span class="cov0" title="0">
+                        if argc != 5 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">num, err := strconv.Atoi(argv[4])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Номер вхождения не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">if fl.Find(argv[3], num) != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Найдено")
+                        }</span> else<span class="cov0" title="0"> {
+                                fmt.Println("Не найдено")
+                        }</span>
+                }
+        case 'L':<span class="cov0" title="0">
+                fl, err := ReadListFromFile(file)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("file bad")
+                        break</span>
+                }
+                <span class="cov0" title="0">switch argv[2][1:] </span>{
+                case "ADDTAIL":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.AddTail(argv[3])
+
+                        fl.WriteToFile(file)</span>
+                case "ADDHEAD":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.AddHead(argv[3])
+
+                        fl.WriteToFile(file)</span>
+                case "INSERT":<span class="cov0" title="0">
+                        if argc != 5 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">index, err := strconv.Atoi(argv[4])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Индекс не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.Insert(argv[3], index)
+
+                        fl.WriteToFile(file)</span>
+                case "REMOVETAIL":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.RemoveTail()
+
+                        fl.WriteToFile(file)</span>
+                case "REMOVEHEAD":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.RemoveHead()
+
+                        fl.WriteToFile(file)</span>
+                case "REMOVEINDEX":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">index, err := strconv.Atoi(argv[3])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Индекс не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.Remove(index)
+
+                        fl.WriteToFile(file)</span>
+                case "PRINT":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fmt.Printf("С головы: %s\nС хвоста %s\n", fl.PrintFromHead(), fl.PrintFromTail())</span>
+                case "REMOVE":<span class="cov0" title="0">
+                        if argc != 5 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">num, err := strconv.Atoi(argv[4])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Номер вхождения не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fl.RemoveKey(argv[3], num)
+
+                        fl.WriteToFile(file)</span>
+                case "FIND":<span class="cov0" title="0">
+                        if argc != 5 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">num, err := strconv.Atoi(argv[4])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Номер вхождения не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">if fl.Find(argv[3], num) != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Найдено")
+                        }</span> else<span class="cov0" title="0"> {
+                                fmt.Println("Не найдено")
+                        }</span>
+                }
+        case 'Q':<span class="cov0" title="0">
+                q, err := ReadQueueFromFile(file)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("file bad")
+                        break</span>
+                }
+                <span class="cov0" title="0">switch argv[2][1:] </span>{
+                case "PUSH":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">q.Push(argv[3])
+
+                        q.WriteToFile(file)</span>
+                case "POP":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fmt.Println(q.Pop())
+
+                        q.WriteToFile(file)</span>
+                case "PRINT":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fmt.Printf("С начала %s\n", q.Print())</span>
+                }
+        case 'S':<span class="cov0" title="0">
+                s, err := ReadStackFromFile(file)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("file bad")
+                        break</span>
+                }
+                <span class="cov0" title="0">switch argv[2][1:] </span>{
+                case "PUSH":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">s.Push(argv[3])
+
+                        s.WriteToFile(file)</span>
+                case "POP":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fmt.Println(s.Pop())
+
+                        s.WriteToFile(file)</span>
+                case "PRINT":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fmt.Printf("С конца %s\n", s.Print())</span>
+                }
+        case 'H':<span class="cov0" title="0">
+                ht, err := ReadHashTableFromFile(file)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("file bad")
+                        break</span>
+                }
+                <span class="cov0" title="0">switch argv[2][1:] </span>{
+                case "ADD":<span class="cov0" title="0">
+                        if argc != 5 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">key, err1 := strconv.Atoi(argv[3])
+                        value, err2 := strconv.Atoi(argv[4])
+                        if err1 != nil || err2 != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Ключ или значение - не число")
+                                break</span>
+                        }
+                        <span class="cov0" title="0">ht.Insert(key, value)
+
+                        ht.WriteToFile(file)</span>
+                case "REMOVE":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">key, err := strconv.Atoi(argv[3])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Ключ не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">ht.Remove(key)
+
+                        ht.WriteToFile(file)</span>
+                case "FIND":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">key, err := strconv.Atoi(argv[3])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Ключ не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">if ht.Contains(key) </span><span class="cov0" title="0">{
+                                fmt.Println("Найдено")
+                        }</span> else<span class="cov0" title="0"> {
+                                fmt.Println("Не найдено")
+                        }</span>
+                case "GET":<span class="cov0" title="0">
+                        if argc != 4 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">key, err := strconv.Atoi(argv[3])
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Ключ не число")
+                                return
+                        }</span>
+                        <span class="cov0" title="0">val, err := ht.Get(key)
+                        if err != nil </span><span class="cov0" title="0">{
+                                fmt.Println("Не найдено")
+                        }</span> else<span class="cov0" title="0"> {
+                                fmt.Println(val)
+                        }</span>
+                case "PRINT":<span class="cov0" title="0">
+                        if argc != 3 </span><span class="cov0" title="0">{
+                                printHelp()
+                                return
+                        }</span>
+                        <span class="cov0" title="0">fmt.Println(ht.ToString())</span>
+                default:<span class="cov0" title="0">
+                        fmt.Println("Неизвестная операция")</span>
+                }
+        default:<span class="cov0" title="0">
+                fmt.Println("Неизвестная структура")</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package queue
+
+import (
+        "bufio"
+        "encoding/binary"
+        "errors"
+        "io"
+        "os"
+)
+
+type queueNode struct {
+        key  string
+        next *queueNode
+}
+
+type Queue struct {
+        top *queueNode
+        bot *queueNode
+}
+
+func (this *Queue) Push(key string) <span class="cov8" title="1">{
+        newNode := &amp;queueNode{key, nil}
+        if this.top == nil </span><span class="cov8" title="1">{
+                this.bot = newNode
+                this.top = newNode
+                return
+        }</span> else<span class="cov8" title="1"> {
+                this.top.next = newNode
+                this.top = newNode
+        }</span>
+}
+
+func (this *Queue) Pop() (string, error) <span class="cov8" title="1">{
+        if this.bot == nil </span><span class="cov8" title="1">{
+                return "", errors.New("out of range")
+        }</span>
+
+        <span class="cov8" title="1">node := this.bot
+        this.bot = node.next
+        if this.bot == nil </span><span class="cov8" title="1">{
+                this.top = nil
+        }</span>
+        <span class="cov8" title="1">return node.key, nil</span>
+}
+
+func (this *Queue) Print() string <span class="cov8" title="1">{
+        node := this.bot
+        if node == nil </span><span class="cov8" title="1">{
+                return ""
+        }</span>
+
+        <span class="cov8" title="1">a := ""
+        for node != nil </span><span class="cov8" title="1">{
+                a += node.key + " "
+                node = node.next
+        }</span>
+        <span class="cov8" title="1">return a</span>
+}
+
+func ReadQueueFromFile(fileStr string) (*Queue, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">scanner := bufio.NewScanner(file)
+        scanner.Split(bufio.ScanWords)
+        q := &amp;Queue{}
+        for scanner.Scan() </span><span class="cov8" title="1">{
+                q.Push(scanner.Text())
+        }</span>
+        <span class="cov8" title="1">file.Close()
+        return q, nil</span>
+}
+
+func ReadQueueFromFileBinary(fileStr string) (*Queue, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">q := &amp;Queue{nil, nil}
+        var stringSize int32
+        for </span><span class="cov8" title="1">{
+                err := binary.Read(file, binary.LittleEndian, &amp;stringSize)
+                if err == io.EOF </span><span class="cov8" title="1">{
+                        break</span>
+                } else<span class="cov8" title="1"> if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">buf := make([]byte, stringSize)
+                n, err := file.Read(buf)
+                if n != int(stringSize) || err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">q.Push(string(buf))</span>
+        }
+        <span class="cov8" title="1">file.Close()
+        return q, nil</span>
+}
+
+func (this *Queue) WriteToFile(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">writer := bufio.NewWriter(file)
+        writer.WriteString(this.Print())
+        writer.Flush()
+        file.Close()
+        return nil</span>
+}
+
+func (this *Queue) WriteToFileBinary(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">node := this.bot
+        for node != nil </span><span class="cov8" title="1">{
+                binary.Write(file, binary.LittleEndian, int32(len(node.key)))
+                file.Write([]byte(node.key))
+                node = node.next
+        }</span>
+        <span class="cov8" title="1">file.Close()
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package stack
+
+import (
+        "bufio"
+        "encoding/binary"
+        "errors"
+        "io"
+        "os"
+)
+
+type stackNode struct {
+        key  string
+        prev *stackNode
+}
+
+type Stack struct {
+        top *stackNode
+}
+
+func (this *Stack) Push(key string) <span class="cov8" title="1">{
+        if this.top == nil </span><span class="cov8" title="1">{
+                this.top = &amp;stackNode{key, nil}
+        }</span> else<span class="cov8" title="1"> {
+                node := stackNode{key, this.top}
+                this.top = &amp;node
+        }</span>
+}
+
+func (this *Stack) Pop() (string, error) <span class="cov8" title="1">{
+        if this.top == nil </span><span class="cov8" title="1">{
+                return "", errors.New("out of range")
+        }</span>
+        <span class="cov8" title="1">ret := this.top.key
+        this.top = this.top.prev
+        return ret, nil</span>
+}
+
+func (this *Stack) Print() string <span class="cov8" title="1">{
+        a := ""
+        node := this.top
+        if node == nil </span><span class="cov8" title="1">{
+                return a
+        }</span>
+        <span class="cov8" title="1">for node.prev != nil </span><span class="cov8" title="1">{
+                a += node.key + " "
+                node = node.prev
+        }</span>
+        <span class="cov8" title="1">a += node.key
+        return a</span>
+}
+
+func ReadStackFromFile(fileStr string) (*Stack, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">s := &amp;Stack{}
+        scanner := bufio.NewScanner(file)
+        scanner.Split(bufio.ScanWords)
+        for scanner.Scan() </span><span class="cov8" title="1">{
+                s.Push(scanner.Text())
+        }</span>
+        <span class="cov8" title="1">file.Close()
+        return s, nil</span>
+}
+
+func ReadStackFromFileBinary(fileStr string) (*Stack, error) <span class="cov8" title="1">{
+        file, err := os.Open(fileStr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">s := &amp;Stack{nil}
+        var stringSize int32
+        for </span><span class="cov8" title="1">{
+                err := binary.Read(file, binary.LittleEndian, &amp;stringSize)
+                if err == io.EOF </span><span class="cov8" title="1">{
+                        break</span>
+                } else<span class="cov8" title="1"> if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">buf := make([]byte, stringSize)
+                n, err := file.Read(buf)
+                if n != int(stringSize) || err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">s.Push(string(buf))</span>
+        }
+        <span class="cov8" title="1">file.Close()
+        return s, nil</span>
+}
+
+func writeToFileRec(writer *bufio.Writer, sn *stackNode) <span class="cov8" title="1">{
+        if sn == nil </span><span class="cov8" title="1">{
+                return
+        }</span>
+        <span class="cov8" title="1">writeToFileRec(writer, sn.prev)
+        writer.WriteString(sn.key + " ")</span>
+}
+
+func (this *Stack) WriteToFile(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">writer := bufio.NewWriter(file)
+        writeToFileRec(writer, this.top)
+        writer.Flush()
+        file.Close()
+        return nil</span>
+}
+
+func writeToFileBinaryRec(file *os.File, sn *stackNode) <span class="cov8" title="1">{
+        if sn == nil </span><span class="cov8" title="1">{
+                return
+        }</span>
+        <span class="cov8" title="1">writeToFileBinaryRec(file, sn.prev)
+        binary.Write(file, binary.LittleEndian, int32(len(sn.key)))
+        file.Write([]byte(sn.key))</span>
+}
+
+func (this *Stack) WriteToFileBinary(fileStr string) error <span class="cov8" title="1">{
+        file, err := os.OpenFile(fileStr, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">writeToFileBinaryRec(file, this.top)
+        file.Close()
+        return nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
